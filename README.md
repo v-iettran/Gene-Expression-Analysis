@@ -62,7 +62,8 @@ install.packages(c("survival", "glmnet"))
 
 You need the TCGA BRCA Pan-Cancer Atlas 2018 dataset:
 
--   **File:** `brca_tcga_pan_can_atlas_2018.tar.gz`
+-   **File:** `brca_tcga_pan_can_atlas_2018.tar.gz` (which can be
+    downloaded from cBioPortal, link below)
 -   **Location:** The script expects this file in the directory
     specified by `downloads_path` (default:
     `/Users/luke/Desktop/UCD/Class/Bio Principle` but should be change
