@@ -291,10 +291,26 @@ vsd = vst(dds)
 vsd
 dds
 
+# Encode ERBB2 status as factors with two levels for easier labelling.
+colData(vsd)$ERBB2 <- factor(
+  ifelse(colData(vsd)$ERBB2 %in% c(1, TRUE, "1", "TRUE"),
+         "Amplified",
+         "Non-amplified"),
+  levels = c("Non-amplified", "Amplified")
+)
+
+
 # Create PCA plot colored by ERBB2 status
 # PCA reduces dimensionality to show major sources of variation
 par(mfrow = c(1, 2))
-plotPCA(vsd, intgroup=c("ERBB2")) + labs(color = "ERBB2")
+plotPCA(vsd, intgroup = "ERBB2") +
+  labs(color = "ERBB2 Status") +
+  scale_color_manual(
+    values = c(
+      "Non-amplified" = "#33a02c",
+      "Amplified"     = "black"
+    )
+  )
 ```
 
 ## Load libraries for pathway enrichment analysis
@@ -492,10 +508,20 @@ vsd_DE = assay(vsd)[top_DE[1:20],]
 library(pheatmap)
 
 # Define colors for ERBB2 annotation (amplified vs non-amplified)
-annotation_colors = list(ERBB2 = c(T = "#1f78b4", F = "#33a02c"))
+annotation_colors = list(
+  ERBB2 = c(
+    "non-amplified" = "lightgreen",
+    "amplified"     = "#1f78b4"
+  )
+)
 
 # Create annotation data frame for column (patient) annotations
-annotation_col = data.frame(ERBB2 = as.matrix(metadata[,3]))
+annotation_col = data.frame(
+  ERBB2 = factor(metadata[,3],
+                 levels = c(0, 1),
+                 labels = c("non-amplified", "amplified"))
+)
+
 rownames(annotation_col) = colnames(vsd)
 
 # Create heatmap
@@ -506,9 +532,10 @@ pheatmap(
   cluster_rows = TRUE,      # Cluster genes
   cluster_cols = TRUE,      # Cluster patients
   scale = 'row',            # Z-score normalization per gene
-  show_colnames = FALSE,    # Hide patient IDs (too many)
+  show_colnames = FALSE,    
   show_rownames = TRUE,     # Show gene names
-  annotation_col = annotation_col)  # Color bar for ERBB2 status
+  annotation_col = annotation_col, 
+  annotation_colors = annotation_colors)  # Color bar for ERBB2 status
 ```
 
 # 5. Kaplan-Meier Survival Curve Analysis
